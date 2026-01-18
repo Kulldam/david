@@ -1,0 +1,82 @@
+<!doctype html>
+<div class="aspect fullview" style="display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px">
+<div class="gifts">
+<div style="max-width:800px;text-align:center">Si deseas, puedes enviar una contribución o regalo. Gracias por tu apoyo.</div>
+<div class="qr"><img src="images/qr_example.png" alt="QR" style="width:160px;height:160px;object-fit:contain"/></div>
+</div>
+</div>
+</section>
+
+
+<!-- 11. Asistencia - link a WhatsApp con mensaje predefinido -->
+<section class="card animate">
+<div class="aspect fullview" style="display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px">
+<div class="rsvp">
+<div>Confirma tu asistencia por WhatsApp</div>
+<a href="https://wa.me/59165045138?text=Hola%2C%20David!%20%F0%9F%8E%8A.%20% C2%A1Confirmo%20mi%20asistencia!%20% C2%A1Qu%C3%A9%20emoci%C3%B3n%20compartir%20este%20d%C3%ADa%20tan%20especial!%20Nos%20vemos%20muy%20pronto%20para%20celebrar%20en%20grande.%20%E2%9C%A8" target="_blank" rel="noopener">Enviar WhatsApp</a>
+</div>
+</div>
+</section>
+
+
+<!-- 12. Última sección con imagen 16:9 -->
+<section class="card animate">
+<div class="aspect final-hero" style="background:#000;color:white;">
+<img src="images/final_16x9.jpg" alt="Te esperamos" style="width:100%;height:100%;object-fit:cover;object-position:center;opacity:0.95"/>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:white;font-weight:800;font-size:36px;text-shadow:0 8px 24px rgba(0,0,0,.6)">¡Te esperamos!</div>
+</div>
+</section>
+
+
+</main>
+
+
+<script>
+// INTERSECTION OBSERVER para animaciones suaves al bajar
+const obs = new IntersectionObserver((entries)=>{
+entries.forEach(e=>{
+if(e.isIntersecting){ e.target.classList.add('in-view'); }
+});
+},{threshold:0.14});
+document.querySelectorAll('.animate').forEach(el=>obs.observe(el));
+
+
+// COUNTDOWN -> calcula usando tiempo local del equipo del usuario
+function startCountdown(){
+// Fecha objetivo: 24 enero 2026 17:00 (hora local del usuario)
+const target = new Date(2026, 0, 24, 17, 0, 0); // año, mesIndex(0=enero), dia, hora
+
+
+function update(){
+const now = new Date();
+let diff = Math.max(0, target - now);
+const seconds = Math.floor((diff/1000) % 60);
+const minutes = Math.floor((diff/1000/60) % 60);
+const hours = Math.floor((diff/1000/60/60) % 24);
+const days = Math.floor(diff/1000/60/60/24);
+document.getElementById('days').textContent = String(days).padStart(2,'0');
+document.getElementById('hours').textContent = String(hours).padStart(2,'0');
+document.getElementById('minutes').textContent = String(minutes).padStart(2,'0');
+document.getElementById('seconds').textContent = String(seconds).padStart(2,'0');
+
+
+if(diff<=0){ clearInterval(timer); }
+}
+update();
+const timer = setInterval(update,1000);
+}
+startCountdown();
+
+
+// Evitar scroll horizontal inesperado en móviles con imágenes grandes
+window.addEventListener('resize', ()=>{ document.body.style.width = '100%'; });
+
+
+// Ajuste: permitir click en la zona "BAJAR" para bajar al siguiente bloque
+document.querySelectorAll('.mouse-cta').forEach(el=>{
+el.addEventListener('click', ()=>{ window.scrollBy({top:window.innerHeight,behavior:'smooth'}); });
+el.addEventListener('touchstart', ()=>{ window.scrollBy({top:window.innerHeight,behavior:'smooth'}); });
+});
+</script>
+</body>
+</html>
