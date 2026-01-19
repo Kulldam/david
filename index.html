@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <title>Mi graduación 2026</title>
+  <style>
+    /* -----------------------------
+       VARIABLES & RESET
+       ----------------------------- */
+    :root{
+      --bg:#ffffff;
+      --accent:#c99b3a; /* dorado */
+      --text:#ffffff;
+      --muted:#ffffff;
+      --card-radius:14px;
+      --card-shadow:0 8px 30px rgba(0,0,0,.15);
+      --max-card-width:1200px;
+
+      /* tipografías y tamaños */
+      --font-sans: Inter, system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
+      --font-hand: 'Great Vibes', cursive;
+      --h1-size: 10vw;
+      --big-title-size: 7vw;
+      --subtitle-size: 5vw;
+      --lead-size: 5vw;
+      --datebox-size: 32px;
+      --badge-padding: 6px 14px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);overscroll-behavior-y:contain}
+    img{display:block;max-width:100vw;height:auto}
+
+    /* -----------------------------
+       LAYOUT: intro/envelope + invitation
+       ----------------------------- */
+    #intro-container { position: fixed; inset:0; z-index:9999; background: var(--bg); display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .8s ease }
+    .envelope{ width:min(var(--max-card-width),95vw); aspect-ratio:16/9; position:relative; perspective:1200px; display:grid; grid-template-rows:50% 50%; }
+    .card-face{position:absolute;inset:0;border-radius:var(--card-radius);box-shadow:var(--card-shadow);overflow:hidden;background:white;display:flex;align-items:center;justify-content:center}
+    .front{background:linear-gradient(180deg,#fff 0,#fbf8f6 100%);display:grid;grid-template-rows:50% 50%;z-index:3}
+    
+    .subtitle{
+      font-family:var(--font-hand);
+      color:var(--text);
+      margin-top:8px;
+      font-size:var(--subtitle-size)}
+
+    .flap{position:absolute;inset:0 0 0 0;height:50%;transform-origin:top center;border-radius:14px 14px 0 0;background:linear-gradient(180deg,#fff,#f3efe9);z-index:4;transition:transform 1s cubic-bezier(.2,.9,.28,1)}
+    .flap.open{transform:rotateX(180deg);box-shadow:inset 0 -40px 60px rgba(0,0,0,.06)}
+
+    .sello{position:absolute;left:50%;top:100%;transform:translate(-50%,-50%);width:110px;height:110px;border-radius:999px;background:radial-gradient(circle at 30% 30%,#fff,#f3f0ec);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.2);transition:transform .28s ease;z-index:5}
+    .sello:active{transform:translate(-50%,-50%) scale(.96)}
+    .sello .seal-text{font-weight:700;color:var(--accent);font-size:14px}
+
+    /* -----------------------------
+       MAIN INVITATION: shared utilities
+       ----------------------------- */
+    #main-invitation{display:none;opacity:0;transition:opacity 1s ease}
+    #main-invitation.visible{opacity:1}
+
+    main{display:flex;flex-direction:column;align-items:stretch}
+
+    .card{
+      width:100%;
+      max-width:100%;
+      background-color: #666;
+      display:grid;
+      place-items:center;
+      padding:0;
+      margin:0}
+
+    .aspect{width:100%;position:relative;overflow:hidden}
+    .fullview{min-height:auto;display:flex;align-items:center;justify-content:center}
+    .centered{display:flex;align-items:center;justify-content:center}
+    .padded{padding:24px}
+    .container{width:100%;max-width:var(--max-card-width);margin-inline:auto}
+
+    /* hero / photo helpers */
+    .hero-img{display:flex;align-items:center;justify-content:center;background:rgba(63,69,112,0.8);position:relative}
+    .hero-img img{width:100%;height:auto;object-fit:contain;display:block}
+    .hero-text{position:absolute;top:85%;left:50%;width:90%;transform:translate(-50%,-50%);text-align:center;color:white;text-shadow:0 6px 18px rgba(0,0,0,.45);z-index:6}
+    .hero-text h1{margin:0;font-size:var(--h1-size);font-family:var(--font-hand);font-weight:800;text-shadow:0 8px 32px rgba(218,173,61,1)}
+
+    /* particle containers inside hero sections (positioning) */
+    .particles { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:4; }
+
+    /* bg-card using <img> + overlay content */
+    .bg-card{position:relative;width:100%;display:flex;align-items:center;justify-content:center;color:white}
+    .bg-card img{width:100%;height:auto;display:block;object-fit:contain}
+    .card-content{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center;z-index:6}
+
+    /* typography moved to CSS */
+    .big-title{font-size:var(--big-title-size);font-family:var(--font-hand);font-weight:800;line-height:1}
+    .gold-text{color:var(--accent)}
+
+    .lead{
+      font-family:var(--font-hand);
+      font-size:var(--lead-size);
+      color: black;
+      margin-top:12px
+    }
+
+    /* util blocks */
+    .bracket{border:2px solid var(--accent);padding:var(--badge-padding);border-radius:6px}
+    .date-box{font-weight:800;font-size:var(--datebox-size);letter-spacing:0.02em;display:flex;align-items:center;gap:12px;color:var(--text)}
+    .countdown{display:flex;gap:12px;align-items:center;justify-content:center;font-weight:700;color:var(--text)}
+    .countdown .item{min-width:74px;background:rgba(0,0,0,.06);padding:12px;border-radius:8px;text-align:center}
+    .countdown .num{font-size:20px}
+    .countdown .label{font-size:12px;color:var(--muted)}
+
+    /* Make .gifts fill the card area (change requested) */
+    .gifts{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center; position:absolute; inset:0; justify-content:center; z-index:6}
+    .qr{width:240px;height:240px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 36px rgba(0,0,0,.14);z-index:8}
+
+    /* buttons */
+    .map-btn{display:inline-block;padding:12px 16px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700}
+    .rsvp{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--text)}
+    .rsvp a{display:inline-block;padding:12px 18px;background:#25D366;color:white;border-radius:10px;text-decoration:none;font-weight:700}
+
+    /* two-column helper */
+    .two-col{display:flex;flex-direction:column;width:100%}
+    .two-col > .col{flex:1}
+    .col{padding:24px}
+    @media (min-width:900px){ .two-col{flex-direction:row} .two-col .col{padding:48px} }
+
+    /* dress / small grids */
+    .dress-grid{display:flex;flex-direction:column}
+    .dress-grid .item{padding:18px;text-align:center;font-weight:700;background:linear-gradient(180deg,#fff,#f8f6f4);border-radius:10px}
+    @media (min-width:900px){ .dress-grid{flex-direction:row} .dress-grid .item{flex:1} }
+
+    /* final hero vertical: behave like sección 1 */
+    .hero-vertical{display:flex;align-items:center;justify-content:center;position:relative}
+    .hero-vertical img{width:100%;height:auto;object-fit:contain;display:block}
+    /* center hero-text vertically across the photo (adjusted) */
+    .hero-text.hero-bottom{top:50%;left:50%;transform:translate(-50%,-50%);width:90%;z-index:6}
+
+    /* overlay text styles (used across multiple sections) */
+    .overlay-title{font-weight:800;font-size:22px;text-shadow:0 6px 18px rgba(0,0,0,.6);margin-bottom:8px;color:white}
+
+    /* animations */
+    .animate{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+    .in-view{opacity:1;transform:translateY(0)}
+
+    /* music button */
+    .music-btn{position:fixed;bottom:24px;right:24px;width:50px;height:50px;background:var(--accent);border-radius:50%;border:none;box-shadow:0 4px 15px rgba(0,0,0,0.3);cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .6s ease,transform .2s}
+    .music-btn.visible{opacity:1;pointer-events:auto}
+    .music-btn svg{width:20px;height:20px;fill:white}
+
+    /* small-screen adjustments */
+    @media (max-width:480px){ .big-title{font-size:10vw} .hero-text h1{font-size:9vw} }
+
+    /* -----------------------------
+       PARTICLE STYLES & KEYFRAMES
+       ----------------------------- */
+
+    /* STARS - caída vertical */
+    .star {
+      position: absolute;
+      width: 14px; height: 14px;
+      transform-origin: center;
+      pointer-events: none;
+      z-index:5;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.12));
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    .star.small { width:8px;height:8px; }
+    .star.med { width:12px;height:12px; }
+    .star.big { width:18px;height:18px; }
+    .star.xlarge { width:26px;height:26px; }
+
+    /* Use a CSS variable --fall to control per-element fall distance */
+    @keyframes star-fall {
+      0% { transform: translateY(0) rotate(0deg) scale(.6); opacity: 0; }
+      10% { opacity: 1; transform: translateY(20px) rotate(45deg) scale(1); }
+      100% { transform: translateY(var(--fall, 120vh)) rotate(360deg) scale(.95); opacity: 0; }
+    }
+
+    /* HEARTS - efecto 'arrojado con ternura' (usa --rise para distancia vertical y --dx para drift) */
+    .heart {
+      position:absolute;
+      width:46px; height:46px;
+      transform-origin:center;
+      pointer-events:none;
+      z-index:5;
+      opacity:0;
+      will-change: transform, opacity;
+    }
+    .heart.small { width:28px;height:28px; }
+    .heart.med { width:44px;height:44px; }
+    .heart.big { width:60px;height:60px; }
+
+    @keyframes heart-throw {
+      0% { transform: translateY(0) translateX(0) scale(.2) rotate(-10deg); opacity:0; }
+      10% { opacity:1; transform: translateY(-24px) translateX(var(--dx, 8px)) scale(.9) rotate(0deg); }
+      60% { transform: translateY(calc(-1 * (var(--rise, 300px) * 0.7))) translateX(calc(var(--dx, 20px))) scale(1.03) rotate(6deg); }
+      100% { transform: translateY(calc(-1 * var(--rise, 300px))) translateX(calc(var(--dx, 40px))) scale(.9) rotate(12deg); opacity:0; }
+    }
+
+    /* BILLS & GIFTS - entrada desde extremos */
+    .qr-section {
+      min-height: 100vh; 
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .edge-item {
+      position:absolute;
+      width:56px;height:36px;
+      transform-origin:center;
+      pointer-events:none;
+      z-index:5;
+      opacity:0;
+      will-change: transform, opacity;
+    }
+    .edge-item.gift { width:48px;height:48px; }
+    .edge-item.bill { width:72px;height:44px; }
+
+    @keyframes edge-in-left {
+      0% { transform: translateX(-20vw) translateY(0) rotate(-20deg) scale(.6); opacity:0; }
+      20% { opacity:1; transform: translateX(0) translateY(-6vh) rotate(6deg) scale(1); }
+      100% { transform: translateX(30vw) translateY(-12vh) rotate(20deg) scale(.9); opacity:0; }
+    }
+    @keyframes edge-in-right {
+      0% { transform: translateX(20vw) translateY(0) rotate(20deg) scale(.6); opacity:0; }
+      20% { opacity:1; transform: translateX(0) translateY(-6vh) rotate(-6deg) scale(1); }
+      100% { transform: translateX(-30vw) translateY(-14vh) rotate(-20deg) scale(.9); opacity:0; }
+    }
+
+    /* gentle fade-out cleanup */
+    .fade-out { transition: opacity .4s ease; opacity:0; }
+
+    /* RSVP final: centered text + Great Vibes */
+    .confirm-box {
+      text-align:center;
+      color:white;
+      font-size:clamp(18px,2.4vw,22px);
+      line-height:1.2;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      align-items:center;
+      justify-content:center;
+      z-index:10;
+    }
+    .confirm-title { font-family:var(--font-hand); font-size:clamp(28px,4.2vw,44px); font-weight:700; color:var(--accent); }
+    .confirm-sub { max-width:720px; font-size:16px; color:white; text-shadow:0 6px 18px rgba(0,0,0,.6); }
+    .confirm-note { font-size:14px; color:rgba(255,255,255,.95); }
+    .confirm-btn { display:inline-block; padding:12px 18px; border-radius:10px; background:#25D366; color:white; font-weight:700; text-decoration:none; }
+    .confirm-sign { margin-top:6px; font-weight:700; color:white; font-family:var(--font-sans); }
+
+    /* -----------------------------
+    DRESS CARD WITH IMAGE
+    ----------------------------- */
+    /* Asegurar que las columnas estiren a la misma altura */
+    .dress-container { align-items: stretch; }
+    .dress-container .two-col { align-items: stretch; }
+
+    /* Hacer que cada columna y tarjeta llenen en altura */
+    .two-col { display:flex; flex-direction:column; gap:0; }
+    @media (min-width:900px) {
+      .two-col { flex-direction:row; }
+    }
+
+    .two-col > .col { display:flex; flex-direction:column; padding:24px; }
+    .two-col .col .dress-grid { display:flex; flex:1; }
+    .dress-card {
+      display:flex;
+      flex-direction:column;
+      border-radius:12px;
+      overflow:hidden;
+      background: #fff;
+      box-shadow: 0 6px 20px rgba(0,0,0,.06);
+      height: 100%;          /* importante: tarjeta ocupa toda la columna */
+    }
+
+    /* CONTENEDOR de imagen que ocupa todo el alto disponible */
+    .dress-card .img-wrap {
+      flex: 1 1 auto;        /* ocupa todo el espacio vertical disponible */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: #f3f3f3;   /* color de relleno visible si object-fit:contain deja bandas */
+    }
+
+    /* Imagen: la propiedad object-fit dicta cómo se presenta
+      - Variante A: object-fit: contain -> se ve toda la imagen (no se recorta)
+      - Variante B: object-fit: cover   -> llena y puede recortar */
+    .dress-card .img-wrap img {
+      display:block;
+      max-width:100%;
+      max-height:100%;
+      width:auto;   /* deja que la imagen mantenga proporción */
+      height:auto;
+      /* Cambia solo esta línea entre 'contain' o 'cover' según la variante */
+      object-fit: contain;    /* <-- Variante A (imagen completa, posible letterbox) */
+      /* object-fit: cover; */ /* <-- Variante B (llenado total, puede recortar) */
+    }
+
+    /* Texto sobre la imagen: lo centramos horizontalmente y lo posicionamos fuera del flujo (puedes ajustarlo) */
+    .dress-card .overlay-title {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 20px;
+      font-weight: 800;
+      text-shadow: 0 4px 14px rgba(0,0,0,.6);
+      z-index: 4;
+    }
+
+    /* Subtítulo en la parte inferior */
+    .dress-card .dress-sub {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.45);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      z-index: 4;
+    }
+
+    /* Necesitamos que la posición absoluta funcione: envolver la tarjeta en relative (ya lo es si usaste .dress-card) */
+    .dress-card { position: relative; }
+
+    /* Opcional: forzar una altura mínima en pantallas grandes */
+    @media (min-width:900px) {
+      .dress-card { min-height: 44vh; } /* ajusta según preferencia (ej. 40vh, 48vh) */
+    }
+    @media (max-width:899px) {
+      .dress-card { min-height: 36vh; }
+    }
+
+    /* Hover para efecto */
+    @media (hover:hover) {
+      .dress-card .img-wrap {
+        transition: transform .6s ease;
+      }
+
+      .dress-card:hover .img-wrap {
+        transform: scale(1.03);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INTRO / SOBRE -->
+  <div id="intro-container">
+    <div class="envelope" id="envelope">
+      <div class="card-face front">
+        <div class="lead">Estás cordialmente invitado</div>
+      </div>
+
+      <div class="flap" id="flap">
+        <div class="sello" id="sello" aria-label="Abrir invitación">
+          <div class="seal-text">TOCAR</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVITACIÓN PRINCIPAL (oculto hasta abrir sobre) -->
+  <div id="main-invitation">
+    <main>
+
+      <!-- SECCIÓN 1: HERO PRINCIPAL -->
+      <section class="card animate">
+        <div class="aspect hero-img" id="section-1-hero">
+          <img src="images/david.png" alt="David Mamani Condori" style="width:100%;height:100%;object-fit:cover">
+          <!-- Contenedor para estrellas (cubre todo el ancho y alto de la sección) -->
+          <div class="particles" id="stars-container" aria-hidden="true" style="inset:0;position:absolute;"></div>
+
+          <div class="hero-text">
+            <h1>Ing. David Mamani Condori</h1>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 2: BANNER TITULO -->
+      <section class="card animate">
+        <div class="bg-card fullview">
+          <img src="images/birrete.jpg" alt="birrete">
+          <div class="card-content">
+            <div class="subtitle gold-text">Celebremos Juntos</div>
+            <div class="big-title">Mi Graduación</div>
+            <div class="subtitle gold-text">2026</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 3: MENSAJE -->
+      <section class="card animate">
+        <div class="bg-card fullview">
+          <img src="images/celebration.jpg" alt="celebracion">
+          <div class="card-content">
+            <p class="subtitle" style="max-width:1000px">Lo que comenzó como un sueño, hoy se convierte en una meta cumplida. Este logro es mío, pero la alegría es mejor si es compartida. Te espero para celebrar este nuevo comienzo.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 4: FECHA y COUNTDOWN (agrupado en two-col) -->
+      <section class="card animate">
+        <div class="container two-col">
+          <div class="col centered">
+            <div class="date-box">
+              <div class="bracket">24</div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start">
+                <div style="font-size:18px;font-weight:700">Sábado</div>
+                <div style="font-size:14px;color:var(--muted)">Enero</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col centered">
+            <div class="countdown" id="countdown">
+              <div class="item"><div class="num" id="days">0</div><div class="label">DÍAS</div></div>
+              <div class="item"><div class="num" id="hours">0</div><div class="label">HRS</div></div>
+              <div class="item"><div class="num" id="minutes">0</div><div class="label">MIN</div></div>
+              <div class="item"><div class="num" id="seconds">0</div><div class="label">SEG</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 5: FAMILIA / FOTO CON OVERLAY -->
+      <section class="card animate">
+        <div class="photo-wrapper">
+          <img src="images/familia.jpg" alt="Familia" style="width:100%;display:block">
+          <div class="overlay-content">
+            <div class="card-content">
+              <div class="subtitle" style="max-width:1000px">Este título no solo representa un logro personal, también es el reflejo del amor y apoyo que recibí. ¡Gracias por ser parte de esta historia!</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 6: TEXTO INVITACIÓN y LUGAR (agrupado en two-col) -->
+      <section class="card animate">
+        <div class="container two-col">
+          <div class="col">
+            <h2>Con alegría te invitamos a ser parte de este día tan especial.</h2>
+          </div>
+          <div class="col">
+            <div style="max-width:700px">
+              <strong>Lugar:</strong>
+              <div>Salón de fiestas. Pabellón USA, Fexpocruz.</div>
+              <div>Santa Cruz de la Sierra, Bolivia.</div>
+              <div style="margin-top:12px"><a class="map-btn" href="https://maps.app.goo.gl/dgpgnfNmKMKHqNdW7" target="_blank" rel="noopener">Ver en Maps</a></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 7: IMAGEN WIDE (aquí aparecerán corazones) -->
+      <section class="card animate">
+        <div class="aspect image-only" id="section-7-photo">
+          <img src="images/madrecita.jpg" alt="foto" style="width:100%;height:100%;object-fit:cover;display:block">
+          <!-- Contenedor de corazones (cubre todo) -->
+          <div class="particles" id="hearts-container" aria-hidden="true" style="inset:0;position:absolute;"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 8: DRESS (agrupado en two-col using dress-grid) -->
+      <section class="card animate">
+        <div class="container two-col">
+
+          <!-- HOMBRE -->
+          <div class="col">
+            <div class="dress-grid">
+              <div class="item dress-card">
+                <img src="images/dress_hombre.png" alt="Vestimenta formal hombre">
+                <div class="overlay-title">Hombre</div>
+                <div class="dress-sub">Formal</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MUJER -->
+          <div class="col">
+            <div class="dress-grid">
+              <div class="item dress-card">
+                <img src="images/dress_mujer.png" alt="Vestimenta formal mujer">
+                <div class="overlay-title">Mujer</div>
+                <div class="dress-sub">Formal</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECCIÓN 9: CITA -->
+      <section class="card animate">
+        <div class="bg-card fullview">
+          <img src="images/superar.jpg" alt="celebracion">
+          <div class="card-content">
+            <p class="subtitle" style="max-width:1000px">El futuro tiene muchos nombres: para los débiles es lo inalcanzable, para los temerosos es lo desconocido y para los valientes es la oportunidad."</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 10: REGALOS / QR (billetes y regalos desde bordes) -->
+      <section class="card animate">
+        <div class="aspect padded qr-section">
+          <!-- .gifts ahora ocupa todo el ancho/alto de la tarjeta -->
+          <div class="gifts" id="gifts-section">
+            <div style="max-width:900px;height: 100%; text-align:center;z-index:8">Si deseas, puedes enviar una contribución o regalo. Gracias por tu apoyo.</div>
+            <div class="qr" style="z-index:9"><img src="images/regalo.jpeg" alt="QR" style="width:90%;height:90%;object-fit:contain;border-radius:8px"/></div>
+            <!-- Contenedor para billetes / regalos (completo) -->
+            <div class="particles" id="gifts-container" aria-hidden="true" style="inset:0;position:absolute;z-index:7;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 11-12: HERO FINAL 9:16 (comportamiento igual que Sección 1)
+           Texto distribuido verticalmente en el centro -->
+      <section class="card animate">
+        <div class="aspect hero-vertical" style="min-height:80vh;position:relative;">
+          <img src="images/familia_portrait.jpg" alt="Te esperamos" style="width:100%;height:100%;object-fit:cover;display:block;">
+
+          <div class="hero-text hero-bottom">
+            <div class="confirm-box" role="region" aria-label="Confirmar asistencia">
+              <div class="confirm-title">Confirma tu Asistencia</div>
+              <div class="confirm-sub">¡Tu presencia hará este día aún más especial! Por favor confirma tu asistencia.</div>
+              <div class="confirm-note">Al presionar, se abrirá WhatsApp con un mensaje predefinido</div>
+              <a class="confirm-btn" id="confirm-whatsapp" target="_blank" rel="noopener"
+                 href="https://wa.me/59165045138?text=Hola%20David%2C%20confirmo%20mi%20asistencia%20a%20tu%20graduaci%C3%B3n%20el%2024%20de%20enero%20de%202026.">Confirmar por WhatsApp</a>
+              <div class="confirm-sign">¡Te esperamos!<br><strong>David Mamani Condori</strong><br>Graduación 2026</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- BOTÓN MÚSICA y <audio> -->
+  <button id="music-control" class="music-btn" aria-label="Pausar o reproducir música">
+    <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="icon-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  </button>
+
+  <audio id="audio" loop preload="auto">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    /* --- ELEMENTS --- */
+    const sello = document.getElementById('sello');
+    const flap = document.getElementById('flap');
+    const introContainer = document.getElementById('intro-container');
+    const mainInvitation = document.getElementById('main-invitation');
+    const audio = document.getElementById('audio');
+    const musicBtn = document.getElementById('music-control');
+    const iconPlay = document.getElementById('icon-play');
+    const iconPause = document.getElementById('icon-pause');
+
+    // particle containers
+    const starsContainer = document.getElementById('stars-container');
+    const heartsContainer = document.getElementById('hearts-container');
+    const giftsContainer = document.getElementById('gifts-container');
+
+    audio.volume = 0.3;
+
+    /* --- AUDIO ICON UPDATE --- */
+    function updateMusicIcon(isPlaying){
+      iconPlay.style.display = isPlaying ? 'none' : 'block';
+      iconPause.style.display = isPlaying ? 'block' : 'none';
+    }
+    updateMusicIcon(!audio.paused);
+
+    /* --- OPEN ENVELOPE --- */
+    sello.addEventListener('click', function(){
+      audio.play().catch(()=>{});
+      musicBtn.classList.add('visible');
+      updateMusicIcon(!audio.paused);
+
+      flap.classList.add('open');
+
+      setTimeout(()=>{
+        introContainer.style.opacity = '0';
+        setTimeout(()=>{
+          introContainer.style.display = 'none';
+          mainInvitation.style.display = 'block';
+          setTimeout(()=>{
+            mainInvitation.classList.add('visible');
+            startObservers();
+            startEffects(); // start particle effects when main is shown
+          },50);
+        },800);
+      },1200);
+    });
+
+    /* --- MUSIC CONTROL --- */
+    musicBtn.addEventListener('click', ()=>{
+      if(audio.paused){ audio.play(); updateMusicIcon(true); } else { audio.pause(); updateMusicIcon(false); }
+    });
+
+    /* --- SCROLL ANIMATIONS --- */
+    function startObservers(){
+      const obs = new IntersectionObserver((entries)=>{
+        entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in-view'); });
+      },{threshold:0.1});
+      document.querySelectorAll('.animate').forEach(el=>obs.observe(el));
+    }
+
+    /* --- COUNTDOWN --- */
+    function startCountdown(){
+      const target = new Date(2026,0,24,17,0,0); // 24 Ene 2026 17:00:00 local
+      function update(){
+        const now = new Date();
+        let diff = Math.max(0, target - now);
+        const days = Math.floor(diff/1000/60/60/24);
+        const hours = Math.floor((diff/1000/60/60) % 24);
+        const minutes = Math.floor((diff/1000/60) % 60);
+        const seconds = Math.floor((diff/1000) % 60);
+        document.getElementById('days').textContent = String(days).padStart(2,'0');
+        document.getElementById('hours').textContent = String(hours).padStart(2,'0');
+        document.getElementById('minutes').textContent = String(minutes).padStart(2,'0');
+        document.getElementById('seconds').textContent = String(seconds).padStart(2,'0');
+        if(diff<=0) clearInterval(timer);
+      }
+      update();
+      const timer = setInterval(update,1000);
+    }
+    startCountdown();
+
+    /* ===========================
+       PARTICLE EFFECTS (STARS, HEARTS, GIFTS)
+       - startEffects() called when invitation opens
+       - each effect spawns nodes and auto-cleans
+       =========================== */
+
+    let starInterval, heartInterval, giftInterval;
+
+    function startEffects() {
+      startStarRain();
+      startHearts();
+      startGiftsAndBills();
+    }
+
+    /* ---------------------------
+       STARS (SECCIÓN 1) - now fall across the whole section height
+       --------------------------- */
+    function startStarRain() {
+      const maxStars = 45;          // densidad
+      const spawnRate = 300;        // ms entre spawns
+      const sizes = ['small','med','big','xlarge'];
+      let active = 0;
+
+      starInterval = setInterval(()=>{
+        try {
+          if (active >= maxStars) return;
+          active++;
+          const star = document.createElement('div');
+          const sizeClass = sizes[Math.floor(Math.random()*sizes.length)];
+          star.className = 'star ' + sizeClass;
+
+          // generar un solo id para el gradiente y reutilizarlo
+          const gid = 'g' + Math.random().toString(36).slice(2,8);
+
+          star.innerHTML = `
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="${gid}" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#f8e7b3"></stop>
+                  <stop offset="100%" stop-color="#d6a92a"></stop>
+                </linearGradient>
+              </defs>
+              <path fill="url(#${gid})" d="M12 2.9l1.9 4.4 4.9.7-3.5 3.4.8 4.8L12 15.8 7.9 17.2l.8-4.8L5.2 8.9l4.9-.7L12 2.9z"/>
+            </svg>`;
+
+          // container dims
+          const container = starsContainer;
+          if (!container) { active--; return; }
+          const containerWidth = container.clientWidth || window.innerWidth;
+          const containerHeight = container.clientHeight || window.innerHeight;
+
+          // place randomly across full width; start ligeramente arriba
+          const x = Math.random() * (containerWidth - 20);
+          // pequeño drift horizontal incluido en la posición inicial en lugar de transform
+          const drift = (Math.random() - 0.5) * 120;
+          star.style.left = `${Math.max(0, x + drift)}px`;
+          star.style.top = `${-10 - Math.random()*40}px`;
+
+          // distancia de caída para llegar al fondo del contenedor
+          const fallDistance = containerHeight + 120 + Math.random()*120;
+          star.style.setProperty('--fall', `${fallDistance}px`);
+
+          // duración aleatoria (más larga para los grandes)
+          let base = 5200 + Math.random()*3800;
+          if (sizeClass === 'xlarge') base += 1200;
+          const duration = Math.round(base);
+          star.style.animation = `star-fall ${duration}ms linear forwards`;
+
+          container.appendChild(star);
+
+          setTimeout(()=>{
+            try { star.remove(); } catch(e){}
+            active--;
+          }, duration + 800);
+        } catch (err) {
+          // en caso de error inesperado no romper el intervalo
+          console.error('star spawn error', err);
+          active = Math.max(0, active-1);
+        }
+      }, spawnRate);
+    }
+
+    /* ---------------------------
+       HEARTS (SECCIÓN 7) - spawn anywhere inside the section (width & height)
+       --------------------------- */
+    function startHearts(){
+      const maxHearts = 18;
+      const spawnRate = 600;
+      const sizes = ['small','med','big'];
+      let active = 0;
+
+      heartInterval = setInterval(()=>{
+        const sec7 = document.getElementById('section-7-photo');
+        const rect = sec7.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+        if (active >= maxHearts) return;
+        active++;
+
+        const heart = document.createElement('div');
+        const sizeClass = sizes[Math.floor(Math.random()*sizes.length)];
+        heart.className = 'heart ' + sizeClass;
+
+        heart.innerHTML = `
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 21s-7-4.35-9.2-6.5C-0.1 10.9 4.4 6 8.7 8.2 10.4 9.1 12 10.9 12 10.9s1.6-1.8 3.3-2.7C19.6 6 24.1 10.9 21.2 14.5 19 16.65 12 21 12 21z" fill="#ff6b88"/>
+          </svg>`;
+
+        // container dimensions
+        const container = heartsContainer;
+        const width = container.clientWidth || window.innerWidth;
+        const height = container.clientHeight || window.innerHeight;
+
+        // random start position anywhere in the container (covering whole image)
+        const startX = Math.random() * (width - 30);
+        const startY = Math.random() * (height - 30);
+        heart.style.left = `${startX}px`;
+        heart.style.top = `${startY}px`;
+
+        // rise distance (how much it will travel upward) - randomized
+        const rise = 160 + Math.random() * (height * 0.9);
+        heart.style.setProperty('--rise', `${rise}px`);
+
+        // horizontal drift
+        const dx = ((Math.random() - 0.5) * 140).toFixed(0) + 'px';
+        heart.style.setProperty('--dx', dx);
+
+        const duration = 1800 + Math.random()*1800;
+        heart.style.animation = `heart-throw ${Math.round(duration)}ms cubic-bezier(.2,.9,.28,1) forwards`;
+
+        // random initial rotation
+        heart.style.transform = `rotate(${(Math.random()-0.5)*40}deg)`;
+
+        container.appendChild(heart);
+
+        setTimeout(()=>{
+          try { heart.remove(); } catch(e){}
+          active--;
+        }, duration + 600);
+
+      }, spawnRate);
+    }
+
+    /* ---------------------------
+       BILLS & GIFTS (SECCIÓN 10) - spawn along full card area, enter from extremes
+       --------------------------- */
+    function startGiftsAndBills(){
+      const spawnRate = 600;
+      const maxActive = 18;
+      let active = 0;
+      const types = ['gift','bill'];
+
+      giftInterval = setInterval(()=>{
+        const sec = document.getElementById('gifts-section');
+        const rect = sec.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+        if (active >= maxActive) return;
+        active++;
+
+        const el = document.createElement('div');
+        const type = types[Math.random() > 0.5 ? 0 : 1];
+        el.className = 'edge-item ' + (type === 'gift' ? 'gift' : 'bill');
+
+        if (type === 'gift') {
+          el.innerHTML = `
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="2" y="7" width="20" height="12" rx="2" fill="#ffd9d9" stroke="#d49a9a"/>
+              <path d="M12 7v12" stroke="#d49a9a" stroke-width="1.2"/>
+              <path d="M7 7c1.4-2 3.5-3 5-3s3.6 1 5 3" stroke="#d49a9a" stroke-width="1.2" fill="none"/>
+            </svg>`;
+        } else {
+          el.innerHTML = `
+            <svg viewBox="0 0 48 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="1" y="4" width="46" height="20" rx="2" fill="#dff3d9" stroke="#9fcf8a"/>
+              <circle cx="24" cy="14" r="5.2" fill="#9fcf8a"/>
+            </svg>`;
+        }
+
+        // container dims
+        const container = giftsContainer;
+        const width = container.clientWidth || window.innerWidth;
+        const height = container.clientHeight || window.innerHeight;
+
+        // spawn y anywhere in the container vertical band
+        const y = Math.random() * (height - 40);
+        el.style.top = `${y}px`;
+
+        // spawn from left or right edge
+        const enterFromLeft = Math.random() > 0.5;
+        const dur = 2200 + Math.random()*2000;
+        if (enterFromLeft) {
+          el.style.left = `-12vw`;
+          el.style.animation = `edge-in-left ${Math.round(dur)}ms cubic-bezier(.22,.8,.34,1) forwards`;
+        } else {
+          el.style.right = `-12vw`;
+          el.style.animation = `edge-in-right ${Math.round(dur)}ms cubic-bezier(.22,.8,.34,1) forwards`;
+        }
+
+        // small random rotation
+        el.style.transform = `rotate(${(Math.random()-0.5)*24}deg)`;
+
+        container.appendChild(el);
+
+        // cleanup
+        const timeout = 3000 + Math.random()*2200;
+        setTimeout(()=>{
+          try { el.remove(); } catch(e){}
+          active--;
+        }, timeout);
+      }, spawnRate);
+    }
+
+    /* ---------------------------
+       CLEANUP on page unload or if the user navigates away
+       --------------------------- */
+    function stopAllParticleIntervals(){
+      if (starInterval) { clearInterval(starInterval); starInterval = null; }
+      if (heartInterval) { clearInterval(heartInterval); heartInterval = null; }
+      if (giftInterval) { clearInterval(giftInterval); giftInterval = null; }
+    }
+    window.addEventListener('beforeunload', stopAllParticleIntervals);
+
+    /* Safety: Stop spawning after some minutes to avoid heavy DOM accumulation */
+    setTimeout(()=>{ stopAllParticleIntervals(); }, 1000 * 60 * 8); // stop after 8 min
+
+  </script>
+</body>
+</html>
