@@ -1476,27 +1476,35 @@
   </script>
   
   <script>
-  (function () {
+  (async function () {
     const WEBAPP = 'https://script.google.com/macros/s/AKfycbynUbeVaxI6QcINfoPqM8g7IY048_gq8PekulNSpbqadv3f5BUKIS03H5m_eRrgmYA/exec';
     const ua = encodeURIComponent(navigator.userAgent);
     let ip = 'UNKNOWN';
-
+  
     try {
-      // Intentamos obtener la IP con un timeout
+      // El 'await' ahora sí funcionará porque está dentro de 'async function'
       const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      ip = encodeURIComponent(data.ip || 'UNKNOWN');
+      if (response.ok) {
+        const data = await response.json();
+        ip = encodeURIComponent(data.ip || 'UNKNOWN');
+      }
     } catch (e) {
-      console.log("No se pudo obtener la IP, enviando como UNKNOWN");
+      console.warn("No se pudo obtener la IP, se enviará como UNKNOWN:", e);
     }
   
-    // Usamos fetch en lugar de New Image para que sea más rastreable en la consola
-    fetch(`${WEBAPP}?ua=${ua}&ip=${ip}&t=${Date.now()}`, { mode: 'no-cors' });
+    // Enviamos los datos a Google Apps Script
+    const finalUrl = `${WEBAPP}?ua=${ua}&ip=${ip}&t=${Date.now()}`;
+    
+    // Usamos un fetch simple para enviar los datos
+    fetch(finalUrl, { mode: 'no-cors' })
+      .then(() => console.log("Datos enviados correctamente"))
+      .catch(err => console.error("Error al enviar a Google:", err));
   })();
   </script>
 
 </body>
 </html>
+
 
 
 
