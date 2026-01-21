@@ -797,6 +797,7 @@
 
     /* Contenedor circular con borde degradado */
     .gold-circle {
+      position: relative; 
       width: clamp(120px, 60vw, 460px); /* responsive */
       aspect-ratio: 1 / 1; /* círculo perfecto */
       padding: 5px; /* grosor del borde */
@@ -816,6 +817,31 @@
       object-fit: cover;
       border-radius: 50%;
       display: block;
+    }
+
+    .gold-circle__overlay {
+      position: absolute;
+      inset: 0;                          /* top:0; right:0; bottom:0; left:0 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-radius: inherit;
+      /* fondo semitransparente — ajústalo si quieres menos cobertura */
+      background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.60));
+      pointer-events: none;              /* decorativo */
+    }
+
+    /* estilo del texto */
+    .gold-circle__text {
+      color: var(--text);
+      font-family: var(--font-hand);
+      font-weight: 700;
+      font-size: var(--medium-size);
+      line-height: 1;
+      text-shadow: var(--borde-oscuro);
+      padding: 4px 8px;
+      letter-spacing: 0.01em;
     }
 
     /* responsive: en pantallas pequeñas el separador se hace más estrecho y puntos más pequeños */
@@ -962,6 +988,9 @@
           <div class="col">
             <div class="gold-circle">
               <img src="images/usa.jpg" alt="Familia">
+              <div class="gold-circle__overlay" aria-hidden="true">
+                <div class="gold-circle__text">17:00 p.m.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -980,6 +1009,9 @@
           <div class="col">
             <div class="gold-circle">
               <img src="images/eliane.jpg" alt="Familia">
+              <div class="gold-circle__overlay" aria-hidden="true">
+                <div class="gold-circle__text">19:00 p.m.</div>
+              </div>
             </div>
           </div>
 
@@ -1493,13 +1525,14 @@
   
       const finalUrl = `${WEBAPP}?ua=${encodeURIComponent(ua)}&ip=${encodeURIComponent(ip)}&t=${Date.now()}`;
       fetch(finalUrl, { mode: 'no-cors' })
-        .then(() => console.log("¡Logrado! Verifica tu Google Sheet ahora."))
+        .then(() => console.log("¡Bienvenido."))
         .catch(err => console.error("Error de red:", err));
     })();
   </script>
   
 </body>
 </html>
+
 
 
 
