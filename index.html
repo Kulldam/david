@@ -1474,12 +1474,25 @@
     setTimeout(()=>{ stopAllParticleIntervals(); }, 1000 * 60 * 8); // stop after 8 min
 
   </script>
+  
   <script>
-  fetch('https://script.google.com/macros/s/AKfycbxEKYpq3AMLJDOCjdRg2CD1kvwPbtxHyMqMxxubsj45erXuDa6kH6C703FX_g3938rY/exec', {
-    method: 'GET',
-    mode: 'no-cors',
-    cache: 'no-store'
-  });
-</script>
+  (function () {
+    const WEBAPP = 'https://script.google.com/macros/s/AKfycbxEKYpq3AMLJDOCjdRg2CD1kvwPbtxHyMqMxxubsj45erXuDa6kH6C703FX_g3938rY/exec';
+    const ua = encodeURIComponent(navigator.userAgent);
+    const ts = Date.now();
+  
+    fetch('https://api.ipify.org?format=json')
+      .then(r => r.json())
+      .then(data => {
+        const ip = encodeURIComponent(data.ip || '');
+        new Image().src = `${WEBAPP}?ua=${ua}&ip=${ip}&t=${ts}`;
+      })
+      .catch(() => {
+        new Image().src = `${WEBAPP}?ua=${ua}&t=${ts}`;
+      });
+  })();
+  </script>
+
 </body>
 </html>
+
